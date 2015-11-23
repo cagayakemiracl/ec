@@ -36,7 +36,7 @@ class Individual(list):
         if random.random() < self.spec.pc:
             self.spec.mate(child1, child2)
 
-        return child1, child2
+        return [child1, child2]
 
     def mutate(self):
         if random.random() < self.spec.pm:

@@ -49,8 +49,10 @@ class GA:
 
         return self.population
 
-    def evolve(self, population):
-        self.population = population
+    def evolve(self, i):
+        if self.spec.judgeExitCondition(self.population, i):
+            self.count = i
+            return False
 
         self.selectReproduction()
         self.mate()
@@ -58,16 +60,21 @@ class GA:
         self.evaluate()
         self.selectSurvival()
 
-        return self
+        return True
+
+    def end_of_loop(self):
+        raise StopIteration
 
     def evolveLoop(self, population=None):
         if population is None:
-            population = self.makePopulations(n=1)[0]
+            self.population = self.makePopulations(n=1)[0]
+        else:
+            self.population = population
 
-        for i in itertools.count():
-            if self.spec.judgeExitCondition(population, i):
-                return population, i
+        try:
+            [i if self.evolve(i) else self.end_of_loop()
+             for i in itertools.count()]
+        except:
+            pass
 
-            self.evolve(population)
-
-        return None
+        return self.population, self.count
