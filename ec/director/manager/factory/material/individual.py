@@ -3,9 +3,6 @@
 # Copyright (c) 2015 cagayakemiracl All Rights Reserved.
 # $Mail: <cagayakemiracl@gmail.com>
 
-from copy import deepcopy
-import random
-
 from deap import base
 
 
@@ -30,16 +27,13 @@ class Individual(list):
         return self.fitness.values
 
     def mate(self, other):
-        child1 = deepcopy(self)
-        child2 = deepcopy(other)
+        self.spec.mate(self, other)
+        del self.fitness.values, other.fitness.values
 
-        if random.random() < self.spec.pc:
-            self.spec.mate(child1, child2)
-
-        return [child1, child2]
+        return self, other
 
     def mutate(self):
-        if random.random() < self.spec.pm:
-            self.spec.mutate(self)
+        self.spec.mutate(self)
+        del self.fitness.values
 
         return self

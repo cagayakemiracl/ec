@@ -14,6 +14,6 @@ class Group(list):
         return
 
     def evaluate(self):
-        [ind.evaluate() for ind in self]
+        [ind.evaluate() for ind in self if not ind.fitness.valid]
 
         return self
