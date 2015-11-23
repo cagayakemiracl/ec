@@ -23,42 +23,17 @@ class GA:
 
         return populations
 
-    def selectReproduction(self):
-        self.parents = self.population.selectReproduction()
-
-        return self.parents
-
-    def mate(self):
-        self.children = self.parents.mate()
-
-        return self.children
-
-    def mutate(self):
-        self.children.mutate()
-
-        return self.children
-
-    def evaluate(self):
-        self.children.evaluate()
-
-        return self.children
-
-    def selectSurvival(self):
-        self.population[:] = self.spec.selectSurvival(
-            self.parents, self.children)
-
-        return self.population
-
-    def evolve(self, i):
-        if self.spec.judgeExitCondition(self.population, i):
+    def evolve(self, population, i):
+        if self.spec.judgeExitCondition(population, i):
             self.count = i
             return False
 
-        self.selectReproduction()
-        self.mate()
-        self.mutate()
-        self.evaluate()
-        self.selectSurvival()
+        parents = population.selectReproduction()
+        children = parents.mate()
+        children.mutate()
+        children.evaluate()
+        population[:] = self.spec.selectSurvival(
+            parents, children)
 
         return True
 
@@ -67,14 +42,12 @@ class GA:
 
     def evolveLoop(self, population=None):
         if population is None:
-            self.population = self.makePopulations(n=1)[0]
-        else:
-            self.population = population
+            population = self.makePopulations(n=1)[0]
 
         try:
-            [i if self.evolve(i) else self.end_of_loop()
+            [i if self.evolve(population, i) else self.end_of_loop()
              for i in itertools.count()]
         except:
             pass
 
-        return self.population, self.count
+        return population, self.count
